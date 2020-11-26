@@ -25,8 +25,12 @@ import co.eeikee.event.RecursoCriadoEvent;
 import co.eeikee.model.Categoria;
 import co.eeikee.repository.CategoriaRepository;
 import co.eeikee.service.CategoriaService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
+@Api(tags = "Categorias")
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaResource {
@@ -40,6 +44,7 @@ public class CategoriaResource {
 	@Autowired
 	private CategoriaService cs;
 	
+	@ApiOperation("Listar todas as Categorias")
 	@ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true,
 			allowEmptyValue = false, paramType = "header", example = "Bearer access_token")
 	@GetMapping
@@ -47,35 +52,39 @@ public class CategoriaResource {
 		 return cr.findAll();
 	}
 	
+	@ApiOperation("Salvar uma nova categoria")
 	@ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true,
 			allowEmptyValue = false, paramType = "header", example = "Bearer access_token")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
+	public ResponseEntity<Categoria> criar(@ApiParam(name = "Corpo",value = "Representação de uma nova categoria")@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
 		Categoria categoriaSalva = cr.save(categoria);
 		aep.publishEvent(new RecursoCriadoEvent(this, response, categoria.getId()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 	
+	@ApiOperation("Buscar categorias pelo seu ID")
 	@ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true,
 			allowEmptyValue = false, paramType = "header", example = "Bearer access_token")
 	@GetMapping("/{id}")
-	public ResponseEntity<Categoria> buscarPeloId(@PathVariable Long id) {
+	public ResponseEntity<Categoria> buscarPeloId(@ApiParam(value = "Id de uma nova categoria", example = "1")@PathVariable Long id) {
 		return !cr.findById(id).isEmpty() ? ResponseEntity.ok(cr.getOne(id)): ResponseEntity.notFound().build();
 	}
 	
+	@ApiOperation("Remover categorias pelo seu ID")
 	@ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true,
 			allowEmptyValue = false, paramType = "header", example = "Bearer access_token")
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void remover(@PathVariable Long id){
+	public void remover(@ApiParam(value = "Id de uma categoria", example = "1")@PathVariable Long id){
 		cr.deleteById(id);
 	}
 	
+	@ApiOperation("Alterar categorias pelo seu ID")
 	@ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true,
 			allowEmptyValue = false, paramType = "header", example = "Bearer access_token")
 	@PutMapping("/{id}")
-	public ResponseEntity<Categoria> atualizar(@PathVariable Long id, @Validated @RequestBody Categoria categoria){
+	public ResponseEntity<Categoria> atualizar(@ApiParam(value = "Id de uma categoria", example = "1")@PathVariable Long id,@ApiParam(name = "Corpo",value = "Representação de uma categoria")  @Validated @RequestBody Categoria categoria){
 		return ResponseEntity.ok(cs.atualizarCategoria(id, categoria));
 	}
 }

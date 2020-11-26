@@ -12,13 +12,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter{
+	
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManager() throws Exception {
 	return super.authenticationManager();
 	}
+	
 	@Bean
-
 	public PasswordEncoder passwordEncoder() {
 	return NoOpPasswordEncoder.getInstance();
 	}
